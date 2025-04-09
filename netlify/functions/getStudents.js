@@ -31,7 +31,7 @@ exports.handler = async (event) => {
       };
   }
 
-  const filePath = path.join(__dirname, '../../data', fileName);
+  const filePath = path.join(__dirname, 'data', fileName);
 
   return new Promise((resolve) => {
     const students = [];

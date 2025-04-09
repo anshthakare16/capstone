@@ -6,12 +6,13 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <form id="teamForm" class="card">
+  <form id="teamForm" name="teamForm" class="card">
     <h1>🚀 Capstone Project Registration</h1>
 
+    <!-- Select Class -->
     <div class="field-group">
-      <label>Select Class</label>
-      <select name="class" id="classSelect">
+      <label for="classSelect">Select Class</label>
+      <select name="class" id="classSelect" required>
         <option value="">-- Select Class --</option>
         <option value="AIDS">AIDS</option>
         <option value="CSE A">CSE A</option>
@@ -19,40 +20,52 @@
       </select>
     </div>
 
+    <!-- Team Members -->
     <h2>👨‍💻 Team Members</h2>
     <div class="field-group">
-      <label>Member 1</label>
-      <select name="member1" class="member-select"></select>
-      <label>Member 2</label>
-      <select name="member2" class="member-select"></select>
-      <label>Member 3</label>
-      <select name="member3" class="member-select"></select>
-      <label>Member 4</label>
-      <select name="member4" class="member-select"></select>
+      <label for="member1">Member 1</label>
+      <select name="member1" id="member1" class="member-select" required></select>
+
+      <label for="member2">Member 2</label>
+      <select name="member2" id="member2" class="member-select"></select>
+
+      <label for="member3">Member 3</label>
+      <select name="member3" id="member3" class="member-select"></select>
+
+      <label for="member4">Member 4</label>
+      <select name="member4" id="member4" class="member-select"></select>
     </div>
 
+    <!-- Mentor Preferences -->
     <h2>🧑‍🏫 Mentor Preferences</h2>
     <div class="field-group">
-      <label>Mentor 1</label>
-      <select name="mentor1" class="mentor-select"></select>
-      <label>Mentor 2</label>
-      <select name="mentor2" class="mentor-select"></select>
-      <label>Mentor 3</label>
-      <select name="mentor3" class="mentor-select"></select>
-      <label>Mentor 4</label>
-      <select name="mentor4" class="mentor-select"></select>
+      <label for="mentor1">Mentor 1</label>
+      <select name="mentor1" id="mentor1" class="mentor-select" required></select>
+
+      <label for="mentor2">Mentor 2</label>
+      <select name="mentor2" id="mentor2" class="mentor-select"></select>
+
+      <label for="mentor3">Mentor 3</label>
+      <select name="mentor3" id="mentor3" class="mentor-select"></select>
+
+      <label for="mentor4">Mentor 4</label>
+      <select name="mentor4" id="mentor4" class="mentor-select"></select>
     </div>
 
+    <!-- Project Ideas -->
     <h2>💡 Project Ideas</h2>
     <div class="field-group">
-      <label>Idea 1</label>
-      <textarea name="idea1" placeholder="Enter idea"></textarea>
-      <label>Idea 2</label>
-      <textarea name="idea2" placeholder="Enter idea"></textarea>
-      <label>Idea 3</label>
-      <textarea name="idea3" placeholder="Enter idea"></textarea>
+      <label for="idea1">Idea 1</label>
+      <textarea name="idea1" id="idea1" placeholder="Enter idea" required></textarea>
+
+      <label for="idea2">Idea 2</label>
+      <textarea name="idea2" id="idea2" placeholder="Enter idea"></textarea>
+
+      <label for="idea3">Idea 3</label>
+      <textarea name="idea3" id="idea3" placeholder="Enter idea"></textarea>
     </div>
 
+    <!-- Submit -->
     <button type="submit">Submit Team</button>
     <div id="response"></div>
   </form>

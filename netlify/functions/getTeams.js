@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-exports.handler = async (event) => {
-  const filePath = path.join(__dirname, '../../data/teams.csv');
+exports.handler = async () => {
+  const filePath = path.join(__dirname, 'data', 'teams.csv');
 
   try {
     const content = fs.readFileSync(filePath, 'utf-8');

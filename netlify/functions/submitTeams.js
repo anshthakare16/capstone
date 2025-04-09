@@ -27,7 +27,7 @@ exports.handler = async (event) => {
       ...ideas
     ];
 
-    const filePath = path.join(__dirname, '../../data/teams.csv');
+    const filePath = path.join(__dirname, 'data', 'teams.csv');
     const exists = fs.existsSync(filePath);
 
     if (!exists) {
