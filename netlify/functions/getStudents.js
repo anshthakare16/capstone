@@ -3,7 +3,7 @@ const path = require('path');
 const csv = require('csv-parser');
 
 exports.handler = async (event) => {
-  const classParam = event.queryStringParameters.class;
+  const classParam = event.queryStringParameters?.class;
   if (!classParam) {
     return {
       statusCode: 400,
@@ -11,7 +11,7 @@ exports.handler = async (event) => {
     };
   }
 
-  let fileName = '';
+  let fileName;
   switch (classParam.toLowerCase()) {
     case 'aids':
       fileName = 'aids_students.csv';
@@ -27,11 +27,18 @@ exports.handler = async (event) => {
     default:
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Invalid class' }),
+        body: JSON.stringify({ error: 'Invalid class specified' }),
       };
   }
 
   const filePath = path.join(__dirname, 'data', fileName);
+
+  if (!fs.existsSync(filePath)) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ error: 'Student data not found for specified class' }),
+    };
+  }
 
   return new Promise((resolve) => {
     const students = [];
@@ -42,15 +49,25 @@ exports.handler = async (event) => {
         if (student) students.push(student);
       })
       .on('end', () => {
-        resolve({
-          statusCode: 200,
-          body: JSON.stringify({ students }),
-        });
+        if (students.length === 0) {
+          resolve({
+            statusCode: 404,
+            body: JSON.stringify({ error: 'No student records found' }),
+          });
+        } else {
+          resolve({
+            statusCode: 200,
+            body: JSON.stringify({ students }),
+          });
+        }
       })
       .on('error', (err) => {
         resolve({
           statusCode: 500,
-          body: JSON.stringify({ error: 'Failed to read file', details: err.message }),
+          body: JSON.stringify({ 
+            error: 'Failed to process student data',
+            details: err.message 
+          }),
         });
       });
   });
