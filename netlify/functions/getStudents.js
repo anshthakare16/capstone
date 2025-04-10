@@ -6,9 +6,9 @@ exports.handler = async function (event, context) {
   const selectedClass = params.get("class");
 
   const classToFileMap = {
-    "AIDS": "aids_students.csv",
-    "CSE A": "csa_a_students.csv",
-    "CSE B": "cse_b_students.csv"
+    "AIDS": "netlify/functions/data/aids_students.csv",
+    "CSE A": "netlify/functions/data/csa_a_students.csv",
+    "CSE B": "netlify/functions/data/cse_b_students.csv"
   };
 
   const filename = classToFileMap[selectedClass];
