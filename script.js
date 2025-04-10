@@ -90,9 +90,22 @@ document.addEventListener('DOMContentLoaded', () => {
     "Aditya Prakash Kunjir", "Pranav Aravindrao Suryawanshi", "Kushagri Saxena"
   ];
 
+  const getStudentsForClass = (classValue) => {
+    switch (classValue) {
+      case "AIDS":
+        return studentsAIDS;
+      case "CSE A":
+        return studentsCSA_A;
+      case "CSE B":
+        return studentsCSE_B;
+      default:
+        return [];
+    }
+  };
+
   const populateDropdown = (dropdowns, students) => {
     dropdowns.forEach(dropdown => {
-      dropdown.innerHTML = `<option value="">-- Select Student --</option>`;
+      dropdown.innerHTML = <option value="">-- Select Student --</option>;
       students.forEach(student => {
         const option = document.createElement('option');
         option.value = student;
@@ -102,10 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // Function to populate mentor dropdowns
   const populateMentorDropdowns = () => {
     mentorDropdowns.forEach(dropdown => {
-      dropdown.innerHTML = `<option value="">-- Select Mentor --</option>`;
+      dropdown.innerHTML = <option value="">-- Select Mentor --</option>;
       mentors.forEach(mentor => {
         const option = document.createElement('option');
         option.value = mentor;
@@ -115,9 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // Update mentor options to prevent duplicates
   const updateMentorOptions = () => {
-    const selectedMentors = Array.from(mentorDropdowns).map(d => d.value);
+    const selectedMentors = mentorDropdowns.map(d => d.value);
     mentorDropdowns.forEach(dropdown => {
       const currentValue = dropdown.value;
       Array.from(dropdown.options).forEach(option => {
@@ -134,9 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // Update student options to prevent duplicates
   const updateStudentOptions = () => {
-    const selectedStudents = Array.from(studentDropdowns).map(d => d.value);
+    const selectedStudents = studentDropdowns.map(d => d.value);
     studentDropdowns.forEach(dropdown => {
       const currentValue = dropdown.value;
       Array.from(dropdown.options).forEach(option => {
@@ -153,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // Initialize dropdowns on page load
+  // Initial population of dropdowns
   populateMentorDropdowns();
 
   // Event listener for class selection
@@ -166,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStudentOptions();
   });
 
-  // Event listeners for mentor and student dropdowns to handle options update
+  // Event listeners for mentor and student dropdowns
   mentorDropdowns.forEach(dropdown => {
     dropdown.addEventListener('change', updateMentorOptions);
   });
@@ -197,13 +207,12 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('textarea[name="idea3"]').value,
     ];
 
-    // Validate the form fields
+    // Validate
     if (!classSelect || members.includes("") || mentors.includes("") || ideas.includes("")) {
       alert("⚠️ Please fill all fields before submitting.");
       return;
     }
 
-    // Construct team data
     const teamData = {
       class: classSelect,
       members,
@@ -226,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("✅ Your team was registered!");
         document.getElementById("teamForm").reset();
 
-        // Re-populate student dropdowns based on selected class
+        // Re-populate students based on selected class
         document.getElementById("classSelect").dispatchEvent(new Event("change"));
 
         // Re-populate mentor dropdowns
