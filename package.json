@@ -1,5 +1,13 @@
 {
   "name": "capstone-team-registration",
   "version": "1.0.0",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "mongodb": "^4.0.0",  // Add other dependencies here as needed
+    "dotenv": "^16.0.0"   // Example for handling environment variables
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"  // Example, if you want to use nodemon for local development
+  },
+  
 }
