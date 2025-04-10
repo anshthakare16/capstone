@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
-    "mongodb": "^4.0.0",     
-  }  
+    "mongodb": "^4.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  },
+  "scripts": {
+    "dev": "nodemon netlify/functions"
+  }
 }
