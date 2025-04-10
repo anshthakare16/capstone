@@ -3,7 +3,7 @@ const path = require('path');
 const csv = require('csv-parser');
 
 exports.handler = async () => {
-  const filePath = path.join(__dirname, 'data', 'teams.csv');
+  const filePath = path.resolve(__dirname, '../../data', 'teams.csv'); // ✅ Fix path
 
   if (!fs.existsSync(filePath)) {
     return {
