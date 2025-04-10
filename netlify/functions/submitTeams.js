@@ -1,6 +1,9 @@
 const { MongoClient } = require('mongodb');
 
-const uri = 'mongodb+srv://thakareansh3:ansh1212@ac-r0zzg7a-shard-00-00.vq4kvnd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const username = process.env.MONGO_USERNAME;
+const password = process.env.MONGO_PASSWORD;
+
+const uri = `mongodb+srv://${username}:${password}@ac-r0zzg7a-shard-00-00.vq4kvnd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -23,6 +26,7 @@ exports.handler = async (event) => {
 
     const client = new MongoClient(uri);
     await client.connect();
+
     const db = client.db('TeamRegistration');
     const teams = db.collection('teams');
 
@@ -31,7 +35,7 @@ exports.handler = async (event) => {
       members,
       mentors,
       ideas,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     await client.close();
