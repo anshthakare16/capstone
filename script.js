@@ -94,40 +94,36 @@ document.addEventListener('DOMContentLoaded', () => {
   function loadStudents(className) {
     let studentList = [];
     if (className === 'AIDS') studentList = studentsAIDS;
-    if (className === 'CSA_A') studentList = studentsCSA_A;
-    if (className === 'CSE_B') studentList = studentsCSE_B;
+    else if (className === 'CSA_A') studentList = studentsCSA_A;
+    else if (className === 'CSE_B') studentList = studentsCSE_B;
 
     studentDropdowns.forEach((dropdown) => {
       // Clear previous options
       dropdown.innerHTML = '';
-      studentList.forEach((student) => {
-        const option = document.createElement('option');
-        option.value = student;
-        option.textContent = student;
-        dropdown.appendChild(option);
-      });
+      if (studentList.length > 0) {
+        studentList.forEach((student) => {
+          const option = document.createElement('option');
+          option.value = student;
+          option.textContent = student;
+          dropdown.appendChild(option);
+        });
+      }
     });
   }
 
   // Function to prevent duplicate mentor selection
   function preventDuplicateMentors() {
-    const selectedMentors = new Set();
     mentorDropdowns.forEach((dropdown, index) => {
       dropdown.addEventListener('change', () => {
         const selectedMentor = dropdown.value;
+        const selectedMentors = new Set(mentorDropdowns.map(d => d.value).filter(Boolean)); // Get currently selected mentors
+
         mentorDropdowns.forEach((otherDropdown, otherIndex) => {
-          if (otherIndex !== index) {
-            const options = otherDropdown.querySelectorAll('option');
-            options.forEach(option => {
-              option.disabled = selectedMentors.has(option.value);
-            });
-          }
+          const options = otherDropdown.querySelectorAll('option');
+          options.forEach(option => {
+            option.disabled = selectedMentors.has(option.value) && otherIndex !== index;
+          });
         });
-        if (selectedMentor) {
-          selectedMentors.add(selectedMentor);
-        } else {
-          selectedMentors.delete(selectedMentor);
-        }
       });
     });
   }
