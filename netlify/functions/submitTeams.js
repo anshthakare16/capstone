@@ -17,7 +17,6 @@ exports.handler = async (event) => {
     const data = JSON.parse(event.body);
     const { class: selectedClass, members = [], mentors = [], ideas = [] } = data;
 
-    // Validation
     if (!selectedClass || members.length === 0 || ideas.length === 0) {
       return {
         statusCode: 400,
@@ -34,7 +33,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const filePath = path.join(__dirname, 'data', 'teams.csv');
+    const filePath = path.resolve(__dirname, '../../data', 'teams.csv'); // ✅ Fix path
     const fileExists = await exists(filePath);
 
     if (!fileExists) {
