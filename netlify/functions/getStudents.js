@@ -2,6 +2,14 @@ exports.handler = async function (event, context) {
   const params = new URLSearchParams(event.rawQuery);
   const selectedClass = params.get("class");
 
+  // Check if class parameter is provided
+  if (!selectedClass) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Class parameter is missing." })
+    };
+  }
+
   // Hardcoded student data for each class
   const studentsData = {
     "AIDS": [
