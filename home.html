@@ -1,49 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Capstone Portal</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .home-container {
-      max-width: 500px;
-      margin: auto;
-      padding: 2rem;
-      background: rgba(255,255,255,0.1);
-      border-radius: 20px;
-      text-align: center;
-      backdrop-filter: blur(15px);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
-
-    .home-container h1 {
-      margin-bottom: 2rem;
-      color: #fff;
-    }
-
-    .home-container a {
-      display: block;
-      text-decoration: none;
-      background: linear-gradient(135deg, #ff416c, #ff4b2b);
-      color: white;
-      padding: 1rem;
-      margin: 1rem 0;
-      border-radius: 12px;
-      font-weight: bold;
-      transition: 0.3s;
-    }
-
-    .home-container a:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 20px rgba(255, 75, 43, 0.6);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Registration</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="home-container">
-    <h1>👋 Welcome to Capstone Registration</h1>
-    <a href="index.html">📝 Register Your Team</a>
-    <a href="admin.html">🔐 Admin Panel</a>
-  </div>
+    <h1>Team Registration</h1>
+    
+    <form id="registrationForm">
+        <!-- Class selection dropdown -->
+        <label for="classSelect">Select Class:</label>
+        <select id="classSelect" name="classSelect">
+            <option value="AIDS">AIDS</option>
+            <option value="CSA_A">CSA A</option>
+            <option value="CSE_B">CSE B</option>
+        </select>
+        
+        <!-- Student selection dropdowns -->
+        <label for="member1">Member 1:</label>
+        <select name="member1"></select>
+        
+        <label for="member2">Member 2:</label>
+        <select name="member2"></select>
+        
+        <label for="member3">Member 3:</label>
+        <select name="member3"></select>
+        
+        <label for="member4">Member 4:</label>
+        <select name="member4"></select>
+        
+        <!-- Mentor selection dropdowns -->
+        <label for="mentor1">Mentor 1:</label>
+        <select name="mentor1"></select>
+        
+        <label for="mentor2">Mentor 2:</label>
+        <select name="mentor2"></select>
+        
+        <label for="mentor3">Mentor 3:</label>
+        <select name="mentor3"></select>
+        
+        <label for="mentor4">Mentor 4:</label>
+        <select name="mentor4"></select>
+
+        <button type="submit">Submit Your Ideas</button>
+    </form>
+
+    <script src="script.js"></script>
 </body>
 </html>
