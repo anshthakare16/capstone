@@ -4,4 +4,11 @@
   included_files = ["data/*.csv"]   
 
 [dev]
-  functions = "netlify/functions"  
+  functions = "netlify/functions"  [build]
+  functions = "netlify/functions"
+  publish = "public"
+
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
