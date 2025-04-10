@@ -1,16 +1,9 @@
 {
-  "name": "capstone-team-registration",
-  "version": "1.0.0",
-  "main": "index.html",
-  "license": "MIT",
-  "dependencies": {
-    "csv-parser": "^3.0.0",  
-    "aws-sdk": "^2.1017.0",   
-    "util": "^0.12.3",        
-    "fs": "0.0.1-security",   
-    "path": "^0.12.7"        
-  },
-  "devDependencies": {
-    "@netlify/functions": "^1.6.0" 
+    "name": "capstone-team-registration",
+    "version": "1.0.0",
+    "main": "index.html",
+    "license": "MIT",
+    "dependencies": {
+      "csv-parser": "^3.0.0"
+    }
   }
-}
