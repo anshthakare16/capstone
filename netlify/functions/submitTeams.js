@@ -27,13 +27,13 @@ exports.handler = async (event) => {
     if (members.length > 4 || mentors.length > 4 || ideas.length > 3) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ 
-          error: 'Maximum 4 members, 4 mentors and 3 ideas allowed' 
+        body: JSON.stringify({
+          error: 'Maximum 4 members, 4 mentors and 3 ideas allowed',
         }),
       };
     }
 
-    const filePath = path.resolve(__dirname, '../../data', 'teams.csv');
+    const filePath = path.resolve(__dirname, '../../data', 'teams.csv'); // ✅ Fix path
     const fileExists = await exists(filePath);
 
     if (!fileExists) {
@@ -48,7 +48,7 @@ exports.handler = async (event) => {
       ...mentors,
       ...Array(4 - mentors.length).fill(''),
       ...ideas,
-      ...Array(3 - ideas.length).fill('')
+      ...Array(3 - ideas.length).fill(''),
     ].join(',');
 
     await appendFile(filePath, row + '\n');
