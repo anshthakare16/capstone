@@ -1,9 +1,5 @@
 {
-    "name": "capstone-team-registration",
-    "version": "1.0.0",
-    "main": "index.html",
-    "license": "MIT",
-    "dependencies": {
-      "csv-parser": "^3.0.0"
-    }
-  }
+  "name": "capstone-team-registration",
+  "version": "1.0.0",
+  "license": "MIT"
+}
