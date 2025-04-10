@@ -1,30 +1,33 @@
-const fs = require('fs');
-const path = require('path');
-const { promisify } = require('util');
-const csvParser = require('csv-parser');
-const readFile = promisify(fs.readFile);
+const { MongoClient } = require('mongodb');
 
-exports.handler = async () => {
-  const filePath = path.resolve(__dirname, '../../data', 'teams.csv');
+const username = process.env.MONGO_USERNAME;
+const password = process.env.MONGO_PASSWORD;
+
+const uri = `mongodb+srv://${username}:${password}@ac-r0zzg7a-shard-00-00.vq4kvnd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+
+exports.handler = async (event) => {
+  if (event.httpMethod !== 'GET') {
+    return {
+      statusCode: 405,
+      body: 'Method Not Allowed',
+    };
+  }
 
   try {
-    const data = await new Promise((resolve, reject) => {
-      const results = [];
-      fs.createReadStream(filePath)
-        .pipe(csvParser())
-        .on('data', (row) => results.push(row))
-        .on('end', () => resolve(results))
-        .on('error', (err) => reject(err));
-    });
+    const client = new MongoClient(uri);
+    await client.connect();
+    const db = client.db('TeamRegistration');
+    const teams = await db.collection('teams').find({}).toArray();
+    await client.close();
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ teams: data }),
+      body: JSON.stringify({ teams }),
     };
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to read CSV data', details: err.message }),
+      body: JSON.stringify({ error: err.message }),
     };
   }
 };
