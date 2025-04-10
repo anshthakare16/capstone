@@ -1,38 +1,38 @@
-const fs = require('fs');
-const path = require('path');
-const csv = require('csv-parser');
+// netlify/functions/getTeams.js
 
-exports.handler = async () => {
-  const filePath = path.resolve(__dirname, '../../data', 'teams.csv'); // ✅ Fix path
+const AWS = require('aws-sdk');
+const s3 = new AWS.S3();
+const BUCKET_NAME = process.env.S3_BUCKET_NAME;  // Set this environment variable in Netlify
 
-  if (!fs.existsSync(filePath)) {
+exports.handler = async (event) => {
+  if (event.httpMethod !== 'GET') {
     return {
-      statusCode: 404,
-      body: JSON.stringify({ error: 'No teams data found' })
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Method Not Allowed' }),
     };
   }
 
-  return new Promise((resolve) => {
-    const teams = [];
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on('data', (row) => {
-        teams.push(row);
-      })
-      .on('end', () => {
-        resolve({
-          statusCode: 200,
-          body: JSON.stringify({ teams }),
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-      })
-      .on('error', (err) => {
-        resolve({
-          statusCode: 500,
-          body: JSON.stringify({ error: 'Failed to read file', details: err.message })
-        });
-      });
-  });
+  try {
+    const classFilter = event.queryStringParameters.class;
+
+    const fileKey = 'teams.csv';
+    const file = await s3.getObject({ Bucket: BUCKET_NAME, Key: fileKey }).promise();
+    const fileData = file.Body.toString('utf-8');
+
+    const rows = fileData.split('\n');
+    const filteredRows = rows.slice(1).filter(row => {
+      const columns = row.split(',');
+      return columns[0] === classFilter;
+    });
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ teams: filteredRows }),
+    };
+  } catch (err) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Failed to fetch data', details: err.message }),
+    };
+  }
 };
