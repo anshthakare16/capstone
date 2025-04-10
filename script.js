@@ -90,26 +90,22 @@ document.addEventListener('DOMContentLoaded', () => {
     "Aditya Prakash Kunjir", "Pranav Aravindrao Suryawanshi", "Kushagri Saxena"
   ];
 
-  let students = [];
-
-  // Handle class selection
-  classDropdown.addEventListener('change', (e) => {
-    const selectedClass = e.target.value;
-    if (selectedClass === 'AIDS') {
-      students = studentsAIDS;
-    } else if (selectedClass === 'CSA_A') {
-      students = studentsCSA_A;
-    } else if (selectedClass === 'CSE_B') {
-      students = studentsCSE_B;
+  const getStudentsForClass = (classValue) => {
+    switch (classValue) {
+      case "AIDS":
+        return studentsAIDS;
+      case "CSE A":
+        return studentsCSA_A;
+      case "CSE B":
+        return studentsCSE_B;
+      default:
+        return [];
     }
-    populateStudentDropdowns();
-    populateMentorDropdowns();
-  });
+  };
 
-  // Populate student dropdowns based on selected class
-  function populateStudentDropdowns() {
-    studentDropdowns.forEach(dropdown => {
-      dropdown.innerHTML = '';
+  const populateDropdown = (dropdowns, students) => {
+    dropdowns.forEach(dropdown => {
+      dropdown.innerHTML = <option value="">-- Select Student --</option>;
       students.forEach(student => {
         const option = document.createElement('option');
         option.value = student;
@@ -117,12 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
         dropdown.appendChild(option);
       });
     });
-  }
+  };
 
-  // Populate mentor dropdowns
-  function populateMentorDropdowns() {
+  const populateMentorDropdowns = () => {
     mentorDropdowns.forEach(dropdown => {
-      dropdown.innerHTML = '';
+      dropdown.innerHTML = <option value="">-- Select Mentor --</option>;
       mentors.forEach(mentor => {
         const option = document.createElement('option');
         option.value = mentor;
@@ -130,11 +125,64 @@ document.addEventListener('DOMContentLoaded', () => {
         dropdown.appendChild(option);
       });
     });
-  }
+  };
 
-  // Initialize on page load
-  populateStudentDropdowns();
+  const updateMentorOptions = () => {
+    const selectedMentors = mentorDropdowns.map(d => d.value);
+    mentorDropdowns.forEach(dropdown => {
+      const currentValue = dropdown.value;
+      Array.from(dropdown.options).forEach(option => {
+        if (
+          option.value &&
+          option.value !== currentValue &&
+          selectedMentors.includes(option.value)
+        ) {
+          option.disabled = true;
+        } else {
+          option.disabled = false;
+        }
+      });
+    });
+  };
+
+  const updateStudentOptions = () => {
+    const selectedStudents = studentDropdowns.map(d => d.value);
+    studentDropdowns.forEach(dropdown => {
+      const currentValue = dropdown.value;
+      Array.from(dropdown.options).forEach(option => {
+        if (
+          option.value &&
+          option.value !== currentValue &&
+          selectedStudents.includes(option.value)
+        ) {
+          option.disabled = true;
+        } else {
+          option.disabled = false;
+        }
+      });
+    });
+  };
+
+  // Initial population of dropdowns
   populateMentorDropdowns();
+
+  // Event listener for class selection
+  classDropdown.addEventListener('change', () => {
+    const classValue = classDropdown.value;
+    if (!classValue) return;
+
+    const students = getStudentsForClass(classValue);
+    populateDropdown(studentDropdowns, students);
+    updateStudentOptions();
+  });
+
+  // Event listeners for mentor and student dropdowns
+  mentorDropdowns.forEach(dropdown => {
+    dropdown.addEventListener('change', updateMentorOptions);
+  });
+  studentDropdowns.forEach(dropdown => {
+    dropdown.addEventListener('change', updateStudentOptions);
+  });
 
   // Handle form submission
   document.getElementById("teamForm").addEventListener("submit", async (e) => {
@@ -159,28 +207,26 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelector('textarea[name="idea3"]').value,
     ];
 
-    // Validate form fields
+    // Validate
     if (!classSelect || members.includes("") || mentors.includes("") || ideas.includes("")) {
       alert("⚠️ Please fill all fields before submitting.");
       return;
     }
 
-    // Construct team data object
     const teamData = {
-      class: classSelect,  // Send the selected class to Netlify Function
-      members,             // Array of student members
-      mentors,             // Array of selected mentors
-      ideas                // Team ideas (array of strings)
+      class: classSelect,
+      members,
+      mentors,
+      ideas
     };
 
     try {
-      // Send data to Netlify Function (submitTeam.js)
       const res = await fetch("/.netlify/functions/submitTeam", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(teamData)  // Send the structured team data
+        body: JSON.stringify(teamData)
       });
 
       const data = await res.json();
@@ -189,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert("✅ Your team was registered!");
         document.getElementById("teamForm").reset();
 
-        // Re-populate the student dropdowns based on selected class
+        // Re-populate students based on selected class
         document.getElementById("classSelect").dispatchEvent(new Event("change"));
 
         // Re-populate mentor dropdowns
