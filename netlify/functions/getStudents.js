@@ -1,74 +1,43 @@
-const fs = require('fs');
-const path = require('path');
-const csv = require('csv-parser');
+const fs = require("fs");
+const path = require("path");
 
-exports.handler = async (event) => {
-  const classParam = event.queryStringParameters?.class;
-  if (!classParam) {
+exports.handler = async function (event, context) {
+  const params = new URLSearchParams(event.rawQuery);
+  const selectedClass = params.get("class");
+
+  const classToFileMap = {
+    "AIDS": "aids_students.csv",
+    "CSE A": "csa_a_students.csv",
+    "CSE B": "cse_b_students.csv"
+  };
+
+  const filename = classToFileMap[selectedClass];
+
+  if (!filename) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'Class parameter missing' }),
+      body: JSON.stringify({ error: "Invalid class selected." })
     };
   }
 
-  let fileName;
-  switch (classParam.toLowerCase()) {
-    case 'aids':
-      fileName = 'aids_students.csv';
-      break;
-    case 'cse a':
-    case 'csea':
-      fileName = 'csa_a_students.csv';
-      break;
-    case 'cse b':
-    case 'cseb':
-      fileName = 'cse_b_students.csv';
-      break;
-    default:
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Invalid class specified' }),
-      };
-  }
+  const filePath = path.join(__dirname, "../../data", filename);
 
-  const filePath = path.resolve(__dirname, '../../data', fileName); // ✅ Fix path
+  try {
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    const lines = fileContent
+      .split("\n")
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
 
-  if (!fs.existsSync(filePath)) {
     return {
-      statusCode: 404,
-      body: JSON.stringify({ error: 'Student data not found for specified class' }),
+      statusCode: 200,
+      body: JSON.stringify({ students: lines })
+    };
+  } catch (err) {
+    console.error("Error reading student file:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Failed to load student list." })
     };
   }
-
-  return new Promise((resolve) => {
-    const students = [];
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on('data', (row) => {
-        const student = row["Name of the Student"]?.trim();
-        if (student) students.push(student);
-      })
-      .on('end', () => {
-        if (students.length === 0) {
-          resolve({
-            statusCode: 404,
-            body: JSON.stringify({ error: 'No student records found' }),
-          });
-        } else {
-          resolve({
-            statusCode: 200,
-            body: JSON.stringify({ students }),
-          });
-        }
-      })
-      .on('error', (err) => {
-        resolve({
-          statusCode: 500,
-          body: JSON.stringify({ 
-            error: 'Failed to process student data',
-            details: err.message 
-          }),
-        });
-      });
-  });
 };
