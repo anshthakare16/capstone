@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
   };
 
-  const populateMentorDropdowns = () => {
+   const populateMentorDropdowns = () => {
     mentorDropdowns.forEach(dropdown => {
       dropdown.innerHTML = `<option value="">-- Select Mentor --</option>`;
       mentors.forEach(mentor => {
@@ -140,8 +140,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  const populateStudentDropdowns = (className) => {
-    const students = studentsData[className];
+  const getStudentsForClass = (classValue) => {
+    switch (classValue) {
+      case "AIDS":
+        return studentsAIDS;
+      case "CSE A":
+        return studentsCSA_A;
+      case "CSE B":
+        return studentsCSE_B;
+      default:
+        return [];
+    }
+  };
+
+  classDropdown?.addEventListener('change', () => {
+    const classValue = classDropdown.value;
+    if (!classValue) return;
+
+    const students = getStudentsForClass(classValue);
+
     studentDropdowns.forEach(dropdown => {
       dropdown.innerHTML = `<option value="">-- Select Student --</option>`;
       students.forEach(student => {
@@ -153,75 +170,80 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     updateStudentOptions();
-  };
+  });
 
-  classDropdown?.addEventListener('change', () => {
-    const selectedClass = classDropdown.value;
-    if (selectedClass) {
-      populateStudentDropdowns(selectedClass);
-    }
+  mentorDropdowns.forEach(dropdown => {
+    dropdown.addEventListener('change', updateMentorOptions);
+  });
+
+  studentDropdowns.forEach(dropdown => {
+    dropdown.addEventListener('change', updateStudentOptions);
   });
 
   populateMentorDropdowns();
+});
 
-  // Handle form submission
-  document.getElementById("teamForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+// Handle form submission
+document.getElementById("teamForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const classSelect = document.getElementById("classSelect").value;
-    const members = [
-      document.querySelector('select[name="member1"]').value,
-      document.querySelector('select[name="member2"]').value,
-      document.querySelector('select[name="member3"]').value,
-      document.querySelector('select[name="member4"]').value,
-    ];
-    const mentors = [
-      document.querySelector('select[name="mentor1"]').value,
-      document.querySelector('select[name="mentor2"]').value,
-      document.querySelector('select[name="mentor3"]').value,
-      document.querySelector('select[name="mentor4"]').value,
-    ];
-    const ideas = [
-      document.querySelector('textarea[name="idea1"]').value,
-      document.querySelector('textarea[name="idea2"]').value,
-      document.querySelector('textarea[name="idea3"]').value,
-    ];
+  const classSelect = document.getElementById("classSelect").value;
+  const members = [
+    document.querySelector('select[name="member1"]').value,
+    document.querySelector('select[name="member2"]').value,
+    document.querySelector('select[name="member3"]').value,
+    document.querySelector('select[name="member4"]').value,
+  ];
+  const mentors = [
+    document.querySelector('select[name="mentor1"]').value,
+    document.querySelector('select[name="mentor2"]').value,
+    document.querySelector('select[name="mentor3"]').value,
+    document.querySelector('select[name="mentor4"]').value,
+  ];
+  const ideas = [
+    document.querySelector('textarea[name="idea1"]').value,
+    document.querySelector('textarea[name="idea2"]').value,
+    document.querySelector('textarea[name="idea3"]').value,
+  ];
 
-    // Validate
-    if (!classSelect || members.includes("") || mentors.includes("") || ideas.includes("")) {
-      alert("⚠️ Please fill all fields before submitting.");
-      return;
+  // Validate
+  if (!classSelect || members.includes("") || mentors.includes("") || ideas.includes("")) {
+    alert("⚠️ Please fill all fields before submitting.");
+    return;
+  }
+
+  const teamData = {
+    class: classSelect,
+    members,
+    mentors,
+    ideas
+  };
+
+  try {
+    const res = await fetch("/.netlify/functions/submitTeam", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(teamData)
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("✅ Your team was registered!");
+      document.getElementById("teamForm").reset();
+
+      // Re-populate students based on selected class
+      document.getElementById("classSelect").dispatchEvent(new Event("change"));
+
+      // Re-populate mentor dropdowns
+      populateMentorDropdowns();
+    } else {
+      alert("❌ Error: " + (data.message || "Something went wrong"));
     }
-
-    const teamData = {
-      class: classSelect,
-      members,
-      mentors,
-      ideas
-    };
-
-    try {
-      const res = await fetch("/.netlify/functions/submitTeam", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(teamData)
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("✅ Your team was registered!");
-        document.getElementById("teamForm").reset();
-        document.getElementById("classSelect").dispatchEvent(new Event("change"));
-        populateMentorDropdowns();
-      } else {
-        alert("❌ Error: " + (data.message || "Something went wrong"));
-      }
-    } catch (err) {
-      console.error("❌ Submission failed:", err);
-      alert("❌ Failed to submit team. Please try again later.");
-    }
-  });
+  } catch (err) {
+    console.error("❌ Submission failed:", err);
+    alert("❌ Failed to submit team. Please try again later.");
+  }
 });
