@@ -167,13 +167,12 @@ try {
   const data = await res.json();
 
   if (res.ok) {
-    alert("✅ Your team was registered!");
-    document.getElementById("teamForm").reset();
-  } else {
-    alert("❌ Failed to submit team: " + (data.error || "Unknown error"));
-  }
-} catch (err) {
-  console.error("❌ Submission error:", err);
-  alert("❌ Failed to connect to server. Please try again later.");
+  alert("✅ Your team was registered!");
+  document.getElementById("teamForm").reset();
+
+  // Re-populate students based on selected class
+  classDropdown.dispatchEvent(new Event("change"));
+
+  // Re-populate mentor dropdowns
+  populateMentorDropdowns();
 }
-});
