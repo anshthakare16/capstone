@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const populateMentorDropdowns = () => {
     mentorDropdowns.forEach(dropdown => {
-      dropdown.innerHTML = `<option value="">-- Select Student --</option>`;
+      dropdown.innerHTML = `<option value="">-- Select Mentor --</option>`;
       mentors.forEach(mentor => {
         const option = document.createElement('option');
         option.value = mentor;
