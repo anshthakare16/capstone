@@ -1,9 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const { promisify } = require('util');
-const writeFile = promisify(fs.writeFile);
-const appendFile = promisify(fs.appendFile);
-const exists = promisify(fs.exists);
+// netlify/functions/submitTeam.js
+
+const AWS = require('aws-sdk');
+const s3 = new AWS.S3();
+const BUCKET_NAME = process.env.S3_BUCKET_NAME;  // Set this environment variable in Netlify
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -33,15 +32,16 @@ exports.handler = async (event) => {
       };
     }
 
-    const filePath = path.resolve(__dirname, '../../data', 'teams.csv'); // ✅ Fix path
-    const fileExists = await exists(filePath);
+    const fileKey = 'teams.csv';
 
-    if (!fileExists) {
-      const header = 'Class,Member1,Member2,Member3,Member4,Mentor1,Mentor2,Mentor3,Mentor4,Idea1,Idea2,Idea3\n';
-      await writeFile(filePath, header);
-    }
+    // Fetch the current CSV from S3
+    const file = await s3.getObject({ Bucket: BUCKET_NAME, Key: fileKey }).promise();
+    const fileData = file.Body.toString('utf-8');
 
-    const row = [
+    // Split CSV data into rows and process
+    const rows = fileData.split('\n');
+    const header = rows[0];
+    const newRow = [
       selectedClass,
       ...members,
       ...Array(4 - members.length).fill(''),
@@ -51,7 +51,16 @@ exports.handler = async (event) => {
       ...Array(3 - ideas.length).fill('')
     ].join(',');
 
-    await appendFile(filePath, row + '\n');
+    // Append new row
+    rows.push(newRow);
+
+    // Upload the updated CSV back to S3
+    await s3.putObject({
+      Bucket: BUCKET_NAME,
+      Key: fileKey,
+      Body: rows.join('\n'),
+      ContentType: 'text/csv',
+    }).promise();
 
     return {
       statusCode: 200,
