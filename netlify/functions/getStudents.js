@@ -31,7 +31,7 @@ exports.handler = async (event) => {
       };
   }
 
-  const filePath = path.join(__dirname, 'data', fileName);
+  const filePath = path.resolve(__dirname, '../../data', fileName); // ✅ Fix path
 
   if (!fs.existsSync(filePath)) {
     return {
