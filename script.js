@@ -90,22 +90,26 @@ document.addEventListener('DOMContentLoaded', () => {
     "Aditya Prakash Kunjir", "Pranav Aravindrao Suryawanshi", "Kushagri Saxena"
   ];
 
-  const getStudentsForClass = (classValue) => {
-    switch (classValue) {
-      case "AIDS":
-        return studentsAIDS;
-      case "CSE A":
-        return studentsCSA_A;
-      case "CSE B":
-        return studentsCSE_B;
-      default:
-        return [];
-    }
+  let selectedStudents = [];
+
+  // Function to prevent duplicate mentor selections
+  const preventDuplicateMentors = () => {
+    mentorDropdowns.forEach(dropdown => {
+      dropdown.addEventListener('change', () => {
+        const selectedMentors = Array.from(mentorDropdowns).map(dropdown => dropdown.value);
+        mentorDropdowns.forEach(dropdown => {
+          [...dropdown.options].forEach(option => {
+            option.disabled = selectedMentors.includes(option.value) && option.value !== dropdown.value;
+          });
+        });
+      });
+    });
   };
 
+  // Function to populate the dropdown with students
   const populateDropdown = (dropdowns, students) => {
     dropdowns.forEach(dropdown => {
-      dropdown.innerHTML = <option value="">-- Select Student --</option>;
+      dropdown.innerHTML = '<option value="">-- Select Student --</option>';
       students.forEach(student => {
         const option = document.createElement('option');
         option.value = student;
@@ -115,137 +119,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  const populateMentorDropdowns = () => {
-    mentorDropdowns.forEach(dropdown => {
-      dropdown.innerHTML = <option value="">-- Select Mentor --</option>;
-      mentors.forEach(mentor => {
-        const option = document.createElement('option');
-        option.value = mentor;
-        option.textContent = mentor;
-        dropdown.appendChild(option);
-      });
-    });
-  };
-
-  const updateMentorOptions = () => {
-    const selectedMentors = mentorDropdowns.map(d => d.value);
-    mentorDropdowns.forEach(dropdown => {
-      const currentValue = dropdown.value;
-      Array.from(dropdown.options).forEach(option => {
-        if (
-          option.value &&
-          option.value !== currentValue &&
-          selectedMentors.includes(option.value)
-        ) {
-          option.disabled = true;
-        } else {
-          option.disabled = false;
-        }
-      });
-    });
-  };
-
-  const updateStudentOptions = () => {
-    const selectedStudents = studentDropdowns.map(d => d.value);
-    studentDropdowns.forEach(dropdown => {
-      const currentValue = dropdown.value;
-      Array.from(dropdown.options).forEach(option => {
-        if (
-          option.value &&
-          option.value !== currentValue &&
-          selectedStudents.includes(option.value)
-        ) {
-          option.disabled = true;
-        } else {
-          option.disabled = false;
-        }
-      });
-    });
-  };
-
-  // Initial population of dropdowns
-  populateMentorDropdowns();
-
-  // Event listener for class selection
+  // Event listener to populate students based on class selection
   classDropdown.addEventListener('change', () => {
-    const classValue = classDropdown.value;
-    if (!classValue) return;
-
-    const students = getStudentsForClass(classValue);
-    populateDropdown(studentDropdowns, students);
-    updateStudentOptions();
-  });
-
-  // Event listeners for mentor and student dropdowns
-  mentorDropdowns.forEach(dropdown => {
-    dropdown.addEventListener('change', updateMentorOptions);
-  });
-  studentDropdowns.forEach(dropdown => {
-    dropdown.addEventListener('change', updateStudentOptions);
-  });
-
-  // Handle form submission
-  document.getElementById("teamForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const classSelect = document.getElementById("classSelect").value;
-    const members = [
-      document.querySelector('select[name="member1"]').value,
-      document.querySelector('select[name="member2"]').value,
-      document.querySelector('select[name="member3"]').value,
-      document.querySelector('select[name="member4"]').value,
-    ];
-    const mentors = [
-      document.querySelector('select[name="mentor1"]').value,
-      document.querySelector('select[name="mentor2"]').value,
-      document.querySelector('select[name="mentor3"]').value,
-      document.querySelector('select[name="mentor4"]').value,
-    ];
-    const ideas = [
-      document.querySelector('textarea[name="idea1"]').value,
-      document.querySelector('textarea[name="idea2"]').value,
-      document.querySelector('textarea[name="idea3"]').value,
-    ];
-
-    // Validate
-    if (!classSelect || members.includes("") || mentors.includes("") || ideas.includes("")) {
-      alert("⚠️ Please fill all fields before submitting.");
-      return;
-    }
-
-    const teamData = {
-      class: classSelect,
-      members,
-      mentors,
-      ideas
-    };
-
-    try {
-      const res = await fetch("/.netlify/functions/submitTeam", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(teamData)
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("✅ Your team was registered!");
-        document.getElementById("teamForm").reset();
-
-        // Re-populate students based on selected class
-        document.getElementById("classSelect").dispatchEvent(new Event("change"));
-
-        // Re-populate mentor dropdowns
-        populateMentorDropdowns();
-      } else {
-        alert("❌ Error: " + (data.message || "Something went wrong"));
-      }
-    } catch (err) {
-      console.error("❌ Submission failed:", err);
-      alert("❌ Failed to submit team. Please try again later.");
+    const selectedClass = classDropdown.value;
+    if (selectedClass === 'AIDS') {
+      populateDropdown(studentDropdowns, studentsAIDS);
+    } else if (selectedClass === 'CSA_A') {
+      populateDropdown(studentDropdowns, studentsCSA_A);
+    } else if (selectedClass === 'CSE_B') {
+      populateDropdown(studentDropdowns, studentsCSE_B);
     }
   });
+
+  // Initially populate the dropdown for the first class
+  classDropdown.dispatchEvent(new Event('change'));
+
+  preventDuplicateMentors();
 });
