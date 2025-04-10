@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     try {
-      const res = await fetch("netlify/functions/submitTeams.js", {
+      const res = await fetch("/.netlify/functions/submitTeam", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
