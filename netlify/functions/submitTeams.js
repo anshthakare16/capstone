@@ -33,7 +33,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const filePath = path.resolve(__dirname, '../../data', 'teams.csv'); // ✅ Fix path
+    const filePath = path.resolve(__dirname, 'data', 'teams.csv');
     const fileExists = await exists(filePath);
 
     if (!fileExists) {
