@@ -90,26 +90,26 @@ document.addEventListener('DOMContentLoaded', () => {
     "Aditya Prakash Kunjir", "Pranav Aravindrao Suryawanshi", "Kushagri Saxena"
   ];
 
-  let selectedStudents = [];
+  let students = [];
 
-  // Function to prevent duplicate mentor selections
-  const preventDuplicateMentors = () => {
-    mentorDropdowns.forEach(dropdown => {
-      dropdown.addEventListener('change', () => {
-        const selectedMentors = Array.from(mentorDropdowns).map(dropdown => dropdown.value);
-        mentorDropdowns.forEach(dropdown => {
-          [...dropdown.options].forEach(option => {
-            option.disabled = selectedMentors.includes(option.value) && option.value !== dropdown.value;
-          });
-        });
-      });
-    });
-  };
+  // Handle class selection
+  classDropdown.addEventListener('change', (e) => {
+    const selectedClass = e.target.value;
+    if (selectedClass === 'AIDS') {
+      students = studentsAIDS;
+    } else if (selectedClass === 'CSA_A') {
+      students = studentsCSA_A;
+    } else if (selectedClass === 'CSE_B') {
+      students = studentsCSE_B;
+    }
+    populateStudentDropdowns();
+    populateMentorDropdowns();
+  });
 
-  // Function to populate the dropdown with students
-  const populateDropdown = (dropdowns, students) => {
-    dropdowns.forEach(dropdown => {
-      dropdown.innerHTML = '<option value="">-- Select Student --</option>';
+  // Populate student dropdowns based on selected class
+  function populateStudentDropdowns() {
+    studentDropdowns.forEach(dropdown => {
+      dropdown.innerHTML = '';
       students.forEach(student => {
         const option = document.createElement('option');
         option.value = student;
@@ -117,22 +117,89 @@ document.addEventListener('DOMContentLoaded', () => {
         dropdown.appendChild(option);
       });
     });
-  };
+  }
 
-  // Event listener to populate students based on class selection
-  classDropdown.addEventListener('change', () => {
-    const selectedClass = classDropdown.value;
-    if (selectedClass === 'AIDS') {
-      populateDropdown(studentDropdowns, studentsAIDS);
-    } else if (selectedClass === 'CSA_A') {
-      populateDropdown(studentDropdowns, studentsCSA_A);
-    } else if (selectedClass === 'CSE_B') {
-      populateDropdown(studentDropdowns, studentsCSE_B);
+  // Populate mentor dropdowns
+  function populateMentorDropdowns() {
+    mentorDropdowns.forEach(dropdown => {
+      dropdown.innerHTML = '';
+      mentors.forEach(mentor => {
+        const option = document.createElement('option');
+        option.value = mentor;
+        option.textContent = mentor;
+        dropdown.appendChild(option);
+      });
+    });
+  }
+
+  // Initialize on page load
+  populateStudentDropdowns();
+  populateMentorDropdowns();
+
+  // Handle form submission
+  document.getElementById("teamForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const classSelect = document.getElementById("classSelect").value;
+    const members = [
+      document.querySelector('select[name="member1"]').value,
+      document.querySelector('select[name="member2"]').value,
+      document.querySelector('select[name="member3"]').value,
+      document.querySelector('select[name="member4"]').value,
+    ];
+    const mentors = [
+      document.querySelector('select[name="mentor1"]').value,
+      document.querySelector('select[name="mentor2"]').value,
+      document.querySelector('select[name="mentor3"]').value,
+      document.querySelector('select[name="mentor4"]').value,
+    ];
+    const ideas = [
+      document.querySelector('textarea[name="idea1"]').value,
+      document.querySelector('textarea[name="idea2"]').value,
+      document.querySelector('textarea[name="idea3"]').value,
+    ];
+
+    // Validate form fields
+    if (!classSelect || members.includes("") || mentors.includes("") || ideas.includes("")) {
+      alert("⚠️ Please fill all fields before submitting.");
+      return;
+    }
+
+    // Construct team data object
+    const teamData = {
+      class: classSelect,  // Send the selected class to Netlify Function
+      members,             // Array of student members
+      mentors,             // Array of selected mentors
+      ideas                // Team ideas (array of strings)
+    };
+
+    try {
+      // Send data to Netlify Function (submitTeam.js)
+      const res = await fetch("/.netlify/functions/submitTeam", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(teamData)  // Send the structured team data
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("✅ Your team was registered!");
+        document.getElementById("teamForm").reset();
+
+        // Re-populate the student dropdowns based on selected class
+        document.getElementById("classSelect").dispatchEvent(new Event("change"));
+
+        // Re-populate mentor dropdowns
+        populateMentorDropdowns();
+      } else {
+        alert("❌ Error: " + (data.message || "Something went wrong"));
+      }
+    } catch (err) {
+      console.error("❌ Submission failed:", err);
+      alert("❌ Failed to submit team. Please try again later.");
     }
   });
-
-  // Initially populate the dropdown for the first class
-  classDropdown.dispatchEvent(new Event('change'));
-
-  preventDuplicateMentors();
 });
