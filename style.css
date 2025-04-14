@@ -1,0 +1,37 @@
+body {
+    background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSh1jXXgi8k3wQdtKwebJFo8oC8-nVVvOhCqQ&s');
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+    text-align: center ;
+}
+
+section.main > div {
+    padding: 2rem;
+}
+
+.stButton > button {
+    background-color: #111827;
+    color: rgb(30, 9, 225);
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.stButton > button:hover {
+    background-color: #1f2937;
+    transform: scale(1.00);
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-top: 1rem;
+    color: #1f2937;
+}
+
+.welcome-sub {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    color: #4b5563;
+}
