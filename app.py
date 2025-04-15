@@ -40,6 +40,22 @@ st.markdown("""
         .stSelectbox>div>div>label {
             color: white;
         }
+        /* Logout button styling */
+        .logout-btn button {
+            background-color: #f44336;
+            color: white;
+        }
+        .logout-btn button:hover {
+            background-color: #d32f2f;
+        }
+        /* Back button styling */
+        .back-btn button {
+            background-color: #2196F3;
+            color: white;
+        }
+        .back-btn button:hover {
+            background-color: #0b7dda;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -67,6 +83,15 @@ STUDENT_FILES = {
 
 # Ensure data folder exists
 os.makedirs("data", exist_ok=True)
+
+# Logout function to reset session state
+def logout():
+    # Reset the page state to initial welcome page
+    st.session_state.page = 0
+    # Clear any other session variables you might have
+    for key in list(st.session_state.keys()):
+        if key != "page":  # Keep the page state reset instead of removing it
+            del st.session_state[key]
 
 # Load student data
 def load_students():
@@ -117,6 +142,17 @@ def welcome_page():
 
 # Registration flow
 def registration_flow():
+    # Add back/logout button
+    col1, col2 = st.columns([1, 6])
+    with col1:
+        st.markdown("<div class='back-btn'>", unsafe_allow_html=True)
+        if st.button("← Back"):
+            st.session_state.page = 1
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+        
+    st.subheader("📝 Capstone Team Registration")
+    
     dept = st.selectbox("Select your department", DEPARTMENTS)
     students_data = load_students()
     registered = get_registered_students(dept)
@@ -154,12 +190,34 @@ def registration_flow():
             save_team_data(dept, full_data)
             st.success("✅ Team registered successfully!")
             st.balloons()
-            if st.button("Register Another Team"):
-                st.session_state.page = 1
+            st.markdown("---")
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("Register Another Team"):
+                    for key in st.session_state.keys():
+                        if key.startswith("mem") or key.startswith("men"):
+                            del st.session_state[key]
+                    st.rerun()
+            with col2:
+                st.markdown("<div class='back-btn'>", unsafe_allow_html=True)
+                if st.button("Return to Home"):
+                    logout()
+                    st.rerun()
+                st.markdown("</div>", unsafe_allow_html=True)
 
 # Admin dashboard
 def admin_dashboard():
     st.title("📊 Admin Dashboard")
+    
+    # Add logout button to top right
+    col1, col2 = st.columns([6, 1])
+    with col2:
+        st.markdown("<div class='logout-btn'>", unsafe_allow_html=True)
+        if st.button("🚪 Logout"):
+            logout()
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+    
     students_data = load_students()
 
     for dept in DEPARTMENTS:
@@ -199,13 +257,45 @@ def admin_dashboard():
 # Admin login
 def admin_login():
     st.title("🔐 Admin Login")
+    
+    # Add back button
+    col1, col2 = st.columns([1, 6])
+    with col1:
+        st.markdown("<div class='back-btn'>", unsafe_allow_html=True)
+        if st.button("← Back"):
+            st.session_state.page = 1
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+    
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
     if st.button("Login"):
         if user == ADMIN_USERNAME and pwd == ADMIN_PASSWORD:
             st.session_state.page = "dashboard"
+            st.rerun()
         else:
             st.error("Invalid credentials")
+
+# Role selection page
+def role_selection():
+    st.title("Select Your Role")
+    
+    # Add back button
+    col1, col2 = st.columns([1, 6])
+    with col1:
+        st.markdown("<div class='back-btn'>", unsafe_allow_html=True)
+        if st.button("← Back"):
+            st.session_state.page = 0
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    option = st.radio("Select your role", ["Team Registration", "Administrator"])
+    if st.button("Proceed"):
+        if option == "Team Registration":
+            st.session_state.page = 2
+        else:
+            st.session_state.page = "admin"
+        st.rerun()
 
 # Navigation
 if "page" not in st.session_state:
@@ -214,12 +304,7 @@ if "page" not in st.session_state:
 if st.session_state.page == 0:
     welcome_page()
 elif st.session_state.page == 1:
-    option = st.radio("Select your role", ["Team Registration", "Administrator"])
-    if st.button("Proceed"):
-        if option == "Team Registration":
-            st.session_state.page = 2
-        else:
-            st.session_state.page = "admin"
+    role_selection()
 elif st.session_state.page == 2:
     registration_flow()
 elif st.session_state.page == "admin":
